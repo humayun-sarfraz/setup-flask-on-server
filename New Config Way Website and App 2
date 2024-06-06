@@ -1,0 +1,226 @@
+Understood. Let's set up the API and website under the trackio project without needing to specify the port number in the URL. Instead, we'll configure Nginx to route requests to the appropriate service based on the URL path.
+
+Step 1: Initial Server Setup
+Update and Upgrade the Server:
+
+sh
+Copy code
+sudo apt update
+sudo apt upgrade -y
+Install Necessary Packages:
+
+sh
+Copy code
+sudo apt install python3-pip python3-dev nginx git -y
+Create the Project Directory:
+
+sh
+Copy code
+sudo mkdir -p /var/www/trackio/api
+sudo mkdir -p /var/www/trackio/website
+sudo chown -R $USER:$USER /var/www/
+Step 2: Setup Python Virtual Environments
+Install Virtualenv:
+
+sh
+Copy code
+sudo pip3 install virtualenv
+Create Virtual Environments:
+
+For API:
+
+sh
+Copy code
+cd /var/www/trackio/api
+virtualenv venv
+For Website:
+
+sh
+Copy code
+cd /var/www/trackio/website
+virtualenv venv
+Step 3: Setup Flask Applications
+Activate the Virtual Environment and Install Flask and Gunicorn:
+
+For API:
+
+sh
+Copy code
+cd /var/www/trackio/api
+source venv/bin/activate
+pip install flask gunicorn
+deactivate
+For Website:
+
+sh
+Copy code
+cd /var/www/trackio/website
+source venv/bin/activate
+pip install flask gunicorn
+deactivate
+Create Sample Flask Applications:
+
+API (/var/www/trackio/api/app.py):
+
+python
+Copy code
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/api')
+def hello_api():
+    return "Hello from API!"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
+Website (/var/www/trackio/website/app.py):
+
+python
+Copy code
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def hello_website():
+    return "Hello from Website!"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
+Step 4: Setup Gunicorn
+Create Systemd Service Files:
+
+For API:
+
+sh
+Copy code
+sudo nano /etc/systemd/system/trackio_api.service
+Add the following content:
+
+ini
+Copy code
+[Unit]
+Description=Gunicorn instance to serve Trackio API
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/trackio/api
+Environment="PATH=/var/www/trackio/api/venv/bin"
+ExecStart=/var/www/trackio/api/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8001 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
+For Website:
+
+sh
+Copy code
+sudo nano /etc/systemd/system/trackio_website.service
+Add the following content:
+
+ini
+Copy code
+[Unit]
+Description=Gunicorn instance to serve Trackio Website
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/trackio/website
+Environment="PATH=/var/www/trackio/website/venv/bin"
+ExecStart=/var/www/trackio/website/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8002 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
+Create wsgi.py Files in Both Directories:
+
+For API:
+
+sh
+Copy code
+cd /var/www/trackio/api
+nano wsgi.py
+Add the following content:
+
+python
+Copy code
+from app import app
+
+if __name__ == "__main__":
+    app.run()
+For Website:
+
+sh
+Copy code
+cd /var/www/trackio/website
+nano wsgi.py
+Add the following content:
+
+python
+Copy code
+from app import app
+
+if __name__ == "__main__":
+    app.run()
+Start and Enable the Services:
+
+sh
+Copy code
+sudo systemctl start trackio_api
+sudo systemctl enable trackio_api
+sudo systemctl start trackio_website
+sudo systemctl enable trackio_website
+Step 5: Configure Nginx
+Create Nginx Configuration File:
+
+sh
+Copy code
+sudo nano /etc/nginx/sites-available/trackio
+Add the following content:
+
+nginx
+Copy code
+server {
+    listen 80;
+
+    server_name your_domain_or_IP;
+
+    location /api {
+        proxy_pass http://127.0.0.1:8001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8002;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+Enable Nginx Configuration:
+
+sh
+Copy code
+sudo ln -s /etc/nginx/sites-available/trackio /etc/nginx/sites-enabled
+sudo nginx -t
+sudo systemctl restart nginx
+Step 6: Adjust Firewall
+Allow Nginx Traffic:
+sh
+Copy code
+sudo ufw allow 'Nginx Full'
+Step 7: Verify the Setup
+Visit Your Server IP:
+http://your_server_ip/api should return "Hello from API!"
+http://your_server_ip/ should return "Hello from Website!"
+Notes:
+Replace your_domain_or_IP with your actual domain or server IP.
+Ensure all paths, filenames, and service names match exactly.
+This configuration ensures that both the API and the website can be accessed without specifying port numbers, with Nginx routing requests based on the URL path.

@@ -9,7 +9,7 @@ Modify the Flask app configuration to explicitly disable Jinja2 template caching
 Example Flask Configuration
 Here’s how you can set this up in your Flask application:
 
-1. Update Flask App Configuration
+<h3>1. Update Flask App Configuration</h3>
 Modify your Flask application to include these configurations:
 
 <pre>
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5011)    
 </pre>
 
-2. Set Environment Variables
+<h3>2. Set Environment Variables</h3>
 Set the environment variables in your terminal before starting the Flask application. This ensures the application runs in development mode:
 
 <pre>
@@ -42,7 +42,7 @@ export FLASK_DEBUG=1
 
 Alternatively, you can include these environment variables in your service file if you are using systemd to manage the Flask application.
 
-3. Update Service File
+<h3>3. Update Service File</h3>
 If you are using a systemd service file to manage your Flask application, ensure it includes these environment variables:
 
 <pre>
@@ -63,7 +63,7 @@ ExecStart=/var/www/trackio/api/env/bin/gunicorn --workers 3 --bind 127.0.0.1:501
 WantedBy=multi-user.target    
 </pre>
 
-4. Reload Systemd and Restart Services
+<h3>4. Reload Systemd and Restart Services</h3>
 After updating the service file, reload the systemd daemon and restart the service:
 
 <pre>

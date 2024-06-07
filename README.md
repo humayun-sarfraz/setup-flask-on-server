@@ -1,61 +1,37 @@
 # setup-flask-on-server
 
-Got it. Here's the adjusted guide based on your specifications:
-Step 1 — Installing the Components from the Ubuntu Repositories
-
-Update the package index and install the necessary packages:
-
-bash
-
+########################################################
+#Installing the Components from the Ubuntu Repositories#
+########################################################
 sudo apt update
 sudo apt install python3-pip python3-dev build-essential libssl-dev libffi-dev python3-setuptools
 
-Step 2 — Creating a Python Virtual Environment
-
-Install python3-venv:
-
-bash
-
+########################################################
+######### Creating a Python Virtual Environment ########
+########################################################
 sudo apt install python3-venv
 
-Create a parent directory for your Flask project and navigate into it:
+mkdir /var/www/<your-directory-name>
+cd /var/www/<your-directory-name>
 
-bash
+python3 -m venv <your-env-name>
 
-sudo mkdir -p /var/www/trackio/api
-cd /var/www/trackio/api
+source <your-env-name>/bin/activate
 
-Create a virtual environment:
 
-bash
+########################################################
+############ Setting Up a Flask Application ############
+########################################################
 
-sudo python3 -m venv trackio-api
+(your-env-name) pip install wheel
 
-Activate the virtual environment:
-
-bash
-
-source trackio-api/bin/activate
-
-Step 3 — Setting Up a Flask Application
-
-Install wheel, Flask, and Gunicorn:
-
-bash
-
-pip install wheel
+#Next, install Flask and Gunicorn:
 pip install gunicorn flask
 
-Create a simple Flask application:
+#create Sample File
+(your-env-name) nano /var/www/<your-directory-name>/<your-file-name.py> # app.py
 
-bash
-
-nano /var/www/trackio/api/app.py
-
-Add the following code:
-
-python
-
+-------------------File Code Start-----------------
 from flask import Flask
 app = Flask(__name__)
 
@@ -64,293 +40,154 @@ def hello():
     return "<h1 style='color:blue'>Hello There!</h1>"
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5003)
+    app.run(host='0.0.0.0', port='5001')
 
-Allow access to port 5003 (adjust firewall settings if necessary):
+-------------------File Code Ends-----------------
 
-bash
+#you should have a UFW firewall enabled. To test the application, you need to allow access to port.
+(your-env-name) sudo ufw allow 5000 #your port number if you have define different in .py file use that
 
-sudo ufw allow 5003
+#then
 
-Test the Flask application:
+(your-env-name) python3 <your-file-name.py> #app.py
 
-bash
+-------------------Your Output Like This Starts-----------------
+Output
+* Serving Flask app "myproject" (lazy loading)
+ * Environment: production
+   WARNING: Do not use the development server in a production environment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://0.0.0.0:5001/ (Press CTRL+C to quit)
+-------------------Your Output Like This Ends-----------------
 
-python app.py
+#Visit your server’s IP address followed by port number 
+http://your_server_ip:5001
 
-Visit http://146.190.130.129:5003 to see the Flask app.
-Step 4 — Configuring Gunicorn
 
-Create a WSGI entry point:
+####### Now Creating the WSGI Entry Point ##########
+(your-env-name) nano /var/www/<your-directory-name>/wsgi.py
 
-bash
-
-nano /var/www/trackio/api/wsgi.py
-
-Add the following code:
-
-python
-
+------------File Code Starts----------
 from app import app
 
 if __name__ == "__main__":
     app.run()
+------------File Code Ends----------
 
-Test Gunicorn:
+####################################################
+##################  Configuring Gunicorn############
+####################################################
 
-bash
+(your-env-name) cd /var/www/<your-directory-name>/
 
-cd /var/www/trackio/api
-gunicorn --bind 0.0.0.0:5003 wsgi:app
+(your-env-name) gunicorn --bind 0.0.0.0:5001 wsgi:app #make sure you are using correct port number.
 
-Visit http://146.190.130.129:5003 to see the Flask app.
-Step 5 — Creating a systemd Service
+-------------Output look like Starts---------------
+Output
+[2020-05-20 14:13:00 +0000] [46419] [INFO] Starting gunicorn 20.0.4
+[2020-05-20 14:13:00 +0000] [46419] [INFO] Listening at: http://0.0.0.0:5001 (46419)
+[2020-05-20 14:13:00 +0000] [46419] [INFO] Using worker: sync
+[2020-05-20 14:13:00 +0000] [46421] [INFO] Booting worker with pid: 46421
+-------------Output look like Ends---------------
 
-Create a systemd service unit file:
+#Visit your server’s IP address with :5001 appended to the end in your web browser again
 
-bash
+http://your_server_ip:5001
 
-sudo nano /etc/systemd/system/trackio-api.service
+#You should see your application’s output in browser
 
-Add the following content:
+#now exit from 
 
-ini
+(your-env-name) deactivate
 
+####################################################
+############# System File For Service ##############
+####################################################
+
+sudo nano /etc/systemd/system/<your_service_name>.service
+
+--------------File Code Starts-------------
 [Unit]
-Description=Gunicorn instance to serve trackio-api
+Description=Gunicorn instance to serve Trackio API
 After=network.target
-
 [Service]
-User=root
-Group=root
-WorkingDirectory=/var/www/trackio/api
-Environment="PATH=/var/www/trackio/api/trackio-api/bin"
-ExecStart=/var/www/trackio/api/trackio-api/bin/gunicorn --workers 3 --bind 0.0.0.0:5003 wsgi:app
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/<your-directory-name>
+Environment="PATH=/var/www/<your-directory-name>/<your-env-name>/bin"
+ExecStart=/var/www/<your-directory-name>/<your-env-name>/bin/gunicorn --workers 3 --bind 127.0.0.1:5001 wsgi:app
 
 [Install]
 WantedBy=multi-user.target
+-------------File Code Ends-----------
 
-Start and enable the service:
+#make sure to setup the  user and group correctly.
+User=www-data #your user
+Group=www-data #your group
 
-bash
+#With that, your systemd service file is complete. Save and close it now.
+sudo systemctl start <your_service_name>
+sudo systemctl enable <your_service_name>
 
-sudo systemctl start trackio-api
-sudo systemctl enable trackio-api
+sudo systemctl status <your_service_name>
 
-Check the status:
+####################################################
+##################### Nginx File ###################
+####################################################
+#Configuring Nginx to Proxy Requests
 
-bash
+sudo nano /etc/nginx/available-sites/<Your-project-name>
 
-sudo systemctl status trackio-api
-
-Step 6 — Configuring Nginx
-
-Create a new server block configuration file:
-
-bash
-
-sudo nano /etc/nginx/sites-available/trackio-api
-
-Add the following content:
-
-nginx
-
+----------------File Code Starts----
 server {
     listen 80;
-    server_name 146.190.130.129;
+
+    server_name Your.IP.Goes.Here;
 
     location / {
-        proxy_pass http://127.0.0.1:5003;
+        proxy_pass http://127.0.0.1:5011;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_redirect off;
     }
-}
 
-Enable the configuration by linking the file to sites-enabled:
+ }
+----------------File Code Ends----
 
-bash
 
-sudo ln -s /etc/nginx/sites-available/trackio-api /etc/nginx/sites-enabled
+sudo ln -s /etc/nginx/sites-available/<Your-project-name> /etc/nginx/sites-enabled
 
-Test the Nginx configuration:
-
-bash
+#With the file in that directory, you can test for syntax errors:
 
 sudo nginx -t
 
-Restart Nginx:
-
-bash
-
 sudo systemctl restart nginx
 
-Step 7 — Adjusting Firewall
-
-Remove the rule for port 5003 and allow full access to the Nginx server:
-
-bash
-
-sudo ufw delete allow 5003
+sudo ufw delete allow 5001
 sudo ufw allow 'Nginx Full'
 
-Step 8 — Securing the Application
 
-Install Certbot and obtain an SSL certificate:
+#Note: You will receive an HTTP 502 gateway error if Nginx cannot access gunicorn’s socket file. Usually this is because the user’s home directory does not allow other users to access files inside it.
 
-bash
+sudo chmod 755 /var/www
 
+
+If you encounter any errors, trying checking the following:
+
+    sudo less /var/log/nginx/error.log: checks the Nginx error logs.
+    sudo less /var/log/nginx/access.log: checks the Nginx access logs.
+    sudo journalctl -u nginx: checks the Nginx process logs.
+    sudo journalctl -u myproject: checks your Flask app’s Gunicorn logs.
+
+
+########################## Securing the Application ########################
 sudo apt install python3-certbot-nginx
-sudo certbot --nginx -d 146.190.130.129
 
-Select the option to redirect HTTP to HTTPS during the Certbot process.
+sudo certbot --nginx -d <IP>_domain name -d www.<IP>_domain name
 
-Check the status:
 
-bash
 
 sudo ufw delete allow 'Nginx HTTP'
-
-Verify the setup
-
-Navigate to https://146.190.130.129 to see your Flask application secured with HTTPS.
-
-This guide will help you set up your Flask application named "trackio-api" on port 5003, managed by Gunicorn, proxied by Nginx, and secured with SSL.
-
-
-
-#Configure Gunicorn and Ngnix
-# Flask Application Deployment Guide
-
-This guide provides step-by-step instructions to run your Flask application continuously and manage multiple applications on the same server using Gunicorn and Nginx. This setup will also allow you to remove the port number from the URL.
-
-## Verifying and Terminating Processes
-
-### Verify the Port is Free
-```sh
-sudo lsof -i :8000
-
-Terminate the Process (if you want to use the same port)
-
-sh
-
-sudo kill <PID>
-
-Run Gunicorn on a New Port
-
-sh
-
-gunicorn --bind 127.0.0.1:<another_port> wsgi:app
-
-Installation and Configuration
-1. Install Required Software
-
-First, install Gunicorn and Nginx if they are not already installed:
-
-sh
-
-sudo apt update
-sudo apt install python3-pip nginx
-pip3 install gunicorn
-
-2. Configure Gunicorn
-
-Navigate to your application directory and test running your Flask app with Gunicorn:
-
-sh
-
-cd /var/www/your_application
-gunicorn --bind 127.0.0.1:8000 wsgi:app
-
-Here, wsgi:app assumes that your Flask application instance is named app and is located in a file named wsgi.py.
-3. Create a Systemd Service for Gunicorn
-
-Create a new service file for your Flask application:
-
-sh
-
-sudo nano /etc/systemd/system/your_application.service
-
-Add the following content to the service file:
-
-ini
-
-[Unit]
-Description=Gunicorn instance to serve your_application
-After=network.target
-
-[Service]
-User=www-data
-Group=www-data
-WorkingDirectory=/var/www/your_application
-ExecStart=/usr/local/bin/gunicorn --workers 3 --bind unix:/var/www/your_application/your_application.sock -m 007 wsgi:app
-
-[Install]
-WantedBy=multi-user.target
-
-Replace /var/www/your_application with the path to your application directory and adjust the User and Group if necessary.
-4. Start and Enable the Gunicorn Service
-
-Enable and start the service:
-
-sh
-
-sudo systemctl start your_application
-sudo systemctl enable your_application
-
-5. Configure Nginx
-
-Create a new Nginx configuration file for your application:
-
-sh
-
-sudo nano /etc/nginx/sites-available/your_application
-
-Add the following content:
-
-nginx
-
-server {
-    listen 80;
-    server_name 146.190.130.129;
-
-    location / {
-        include proxy_params;
-        proxy_pass http://unix:/var/www/your_application/your_application.sock;
-    }
-}
-
-Create a symbolic link to enable this configuration:
-
-sh
-
-sudo ln -s /etc/nginx/sites-available/your_application /etc/nginx/sites-enabled
-
-Test the Nginx configuration and restart the service:
-
-sh
-
-sudo nginx -t
-sudo systemctl restart nginx
-
-6. Allow Multiple Applications
-
-Repeat the above steps for each Flask application you want to host, making sure each application has its own unique Gunicorn socket and Nginx configuration.
-7. Secure Your Server (Optional)
-
-Consider securing your server with HTTPS using Let's Encrypt:
-
-sh
-
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx
-
-Follow the prompts to set up HTTPS.
-
-By following these steps, you will have your Flask application running continuously with Gunicorn and served by Nginx. You can access it via your IP address without a port number, and you can add additional applications as needed.
-
-csharp
-
-
-Save this content in a file named `README.md`. This will serve as a guide for deploying Flask applications using Gunicorn and Nginx.

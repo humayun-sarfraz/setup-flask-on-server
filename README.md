@@ -1,3 +1,3 @@
-#Flask Application Deployment on Ubuntu
+<h1>Flask Application Deployment on Ubuntu</h1>
 
-Please read info.txt file
+<p>Please read info.txt file</p>

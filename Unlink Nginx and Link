@@ -1,0 +1,65 @@
+To properly unlink and relink the Nginx configuration file for your Flask application, follow these steps:
+
+Step 1: Unlink the Existing Nginx Configuration
+First, unlink the existing Nginx configuration file:
+
+sh
+Copy code
+sudo rm /etc/nginx/sites-enabled/trackio
+Step 2: Link the Nginx Configuration File
+Next, link the Nginx configuration file from sites-available to sites-enabled:
+
+sh
+Copy code
+sudo ln -s /etc/nginx/sites-available/trackio /etc/nginx/sites-enabled/
+Step 3: Test the Nginx Configuration
+Test the Nginx configuration for syntax errors:
+
+sh
+Copy code
+sudo nginx -t
+If the test is successful, you will see a message like this:
+
+vbnet
+Copy code
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+Step 4: Reload Nginx
+Reload Nginx to apply the changes:
+
+sh
+Copy code
+sudo systemctl reload nginx
+Example Configuration
+Here is an example Nginx configuration file (/etc/nginx/sites-available/trackio):
+
+nginx
+Copy code
+server {
+    listen 80;
+    server_name Your-IP-;
+
+    location /trackio/api {
+        proxy_pass http://127.0.0.1:5011;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_redirect off;
+    }
+
+    location /trackio {
+        proxy_pass http://127.0.0.1:5012;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_redirect off;
+    }
+}
+Verify the Setup
+After reloading Nginx, verify that the configuration is working by visiting the following URLs:
+
+For the API: http://Your-IP-/trackio/api
+For the website: http://1Your-IP-/trackio
+By following these steps, you can ensure that your Nginx configuration is correctly linked and reloaded, allowing your Flask application to be accessed without specifying port numbers in the URLs.

@@ -57,3 +57,22 @@ if __name__ == "__main__":
 if __name__ == "__main__":
     app.run()
 ------------File Code Ends----------</pre>
+
+<h2>Configuring Gunicorn</h2>
+<pre>(your-env-name) cd /var/www/<your-directory-name>/</pre>
+<p>Make sure you are using correct port number.</p>
+<pre>(your-env-name) gunicorn --bind 0.0.0.0:5001 wsgi:app</pre>
+<p>Output look like.</p>
+<pre>
+Output
+[2020-05-20 14:13:00 +0000] [46419] [INFO] Starting gunicorn 20.0.4
+[2020-05-20 14:13:00 +0000] [46419] [INFO] Listening at: http://0.0.0.0:5001 (46419)
+[2020-05-20 14:13:00 +0000] [46419] [INFO] Using worker: sync
+[2020-05-20 14:13:00 +0000] [46421] [INFO] Booting worker with pid: 46421
+</pre>
+<p>Visit your server’s IP address with :5001 appended to the end in your web browser again</p>
+<pre>http://your_server_ip:5001</pre>
+<p>You should see your application’s output in browser</p>
+<p>Now exit from</p>
+<pre>(your-env-name) deactivate</pre>
+<h2>System File For Service</h2>

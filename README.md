@@ -76,3 +76,16 @@ Output
 <p>Now exit from</p>
 <pre>(your-env-name) deactivate</pre>
 <h2>System File For Service</h2>
+<pre>sudo nano /etc/systemd/system/<your_service_name>.service</pre>
+<pre>[Unit]
+Description=Gunicorn instance to serve Trackio API
+After=network.target
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/<your-directory-name>
+Environment="PATH=/var/www/<your-directory-name>/<your-env-name>/bin"
+ExecStart=/var/www/<your-directory-name>/<your-env-name>/bin/gunicorn --workers 3 --bind 127.0.0.1:5001 wsgi:app
+
+[Install]
+WantedBy=multi-user.target</pre>

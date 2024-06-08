@@ -22,14 +22,18 @@ source your-env-name/bin/activate</pre>
 Next, install Flask and Gunicorn:
 <pre>pip install gunicorn flask</pre>
 
-create Sample File i.e app.py
+Create Sample File i.e app.py
 <pre>(your-env-name) nano /var/www/<your-directory-name>/<your-file-name.py></pre>
+
 <pre>from flask import Flask
 app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    return "<h1 style='color:blue'>Hello There!</h1>"
+    return "< h1 style='color:blue'>Hello There!< /h1>"
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port='5001')</pre>
+<p>You should have a UFW firewall enabled. To test the application, you need to allow access to port.</p>
+<p>Your port number if you have define different in .py file use that</p>
+<pre>(your-env-name) sudo ufw allow 5001</pre>

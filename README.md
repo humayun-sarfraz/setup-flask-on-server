@@ -15,3 +15,21 @@ cd /var/www/your-directory-name
 
 python3 -m venv your-env-name
 source your-env-name/bin/activate</pre>
+
+<h2>Setting Up a Flask Application</h2>
+<pre>(your-env-name) pip install wheel</pre>
+
+Next, install Flask and Gunicorn:
+<pre>pip install gunicorn flask</pre>
+
+create Sample File i.e app.py
+<pre>(your-env-name) nano /var/www/<your-directory-name>/<your-file-name.py></pre>
+<pre>from flask import Flask
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    return "<h1 style='color:blue'>Hello There!</h1>"
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port='5001')</pre>

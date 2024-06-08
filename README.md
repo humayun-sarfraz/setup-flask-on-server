@@ -97,3 +97,10 @@ Group=www-data #your group</p>
 sudo systemctl enable <your_service_name>
 
 sudo systemctl status <your_service_name></pre>
+<h2>Nginx File</h2>
+
+in process...
+
+
+
+<br />

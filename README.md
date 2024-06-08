@@ -19,10 +19,10 @@ source your-env-name/bin/activate</pre>
 <h2>Setting Up a Flask Application</h2>
 <pre>(your-env-name) pip install wheel</pre>
 
-Next, install Flask and Gunicorn:
+<p>Next, install Flask and Gunicorn:</p>
 <pre>pip install gunicorn flask</pre>
 
-Create Sample File i.e app.py
+<p>Create Sample File i.e app.py</p>
 <pre>(your-env-name) nano /var/www/<your-directory-name>/<your-file-name.py></pre>
 
 <pre>from flask import Flask
@@ -37,3 +37,23 @@ if __name__ == "__main__":
 <p>You should have a UFW firewall enabled. To test the application, you need to allow access to port.</p>
 <p>Your port number if you have define different in .py file use that</p>
 <pre>(your-env-name) sudo ufw allow 5001</pre>
+<p>Rurn your applocation. #app.py</p>
+<pre>(your-env-name) python3 <your-file-name.py></pre>
+<p>Output will look like this</p>
+<pre>Output
+* Serving Flask app "myproject" (lazy loading)
+ * Environment: production
+   WARNING: Do not use the development server in a production environment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://0.0.0.0:5001/ (Press CTRL+C to quit)</pre>
+
+ <p>Visit your server’s IP address followed by port number</p>
+ <pre>http://your_server_ip:5001</pre>
+<h2>Now Creating the WSGI Entry Point</h2>
+<pre>(your-env-name) nano /var/www/<your-directory-name>/wsgi.py</pre>
+<pre>from app import app
+
+if __name__ == "__main__":
+    app.run()
+------------File Code Ends----------</pre>

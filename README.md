@@ -89,3 +89,11 @@ ExecStart=/var/www/<your-directory-name>/<your-env-name>/bin/gunicorn --workers 
 
 [Install]
 WantedBy=multi-user.target</pre>
+<p>#make sure to setup the  user and group correctly.
+User=www-data #your user
+Group=www-data #your group</p>
+<p>With that, your systemd service file is complete. Save and close it now.</p>
+<pre>sudo systemctl start <your_service_name>
+sudo systemctl enable <your_service_name>
+
+sudo systemctl status <your_service_name></pre>

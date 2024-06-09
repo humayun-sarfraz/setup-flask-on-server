@@ -98,7 +98,23 @@ sudo systemctl enable <your_service_name>
 
 sudo systemctl status <your_service_name></pre>
 <h2>Nginx File</h2>
+<p>Configuring Nginx to Proxy Requests</p>
+<pre>sudo nano /etc/nginx/available-sites/<Your-project-name></pre>
+<pre>server {
+    listen 80;
 
+    server_name Your.IP.Goes.Here;
+
+    location / {
+        proxy_pass http://127.0.0.1:5001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_redirect off;
+    }
+
+ }</pre>
 in process...
 
 

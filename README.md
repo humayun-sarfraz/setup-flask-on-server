@@ -115,6 +115,8 @@ sudo systemctl status <your_service_name></pre>
     }
 
  }</pre>
+
+ <pre>sudo ln -s /etc/nginx/sites-available/<Your-project-name> /etc/nginx/sites-enabled</pre>
 in process...
 
 

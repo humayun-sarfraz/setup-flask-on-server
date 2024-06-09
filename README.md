@@ -116,7 +116,14 @@ sudo systemctl status <your_service_name></pre>
 
  }</pre>
 
- <pre>sudo ln -s /etc/nginx/sites-available/<Your-project-name> /etc/nginx/sites-enabled</pre>
+<pre>sudo ln -s /etc/nginx/sites-available/<Your-project-name> /etc/nginx/sites-enabled</pre>
+<p>With the file in that directory, you can test for syntax errors</p>
+<pre>sudo nginx -t
+
+sudo systemctl restart nginx
+
+sudo ufw delete allow 5001
+sudo ufw allow 'Nginx Full'</pre>
 in process...
 
 

@@ -127,6 +127,14 @@ sudo ufw allow 'Nginx Full'</pre>
 
 <p>Note: You will receive an HTTP 502 gateway error if Nginx cannot access gunicorn’s socket file. Usually this is because the user’s home directory does not allow other users to access files inside it.</p>
 <pre>sudo chmod 755 /var/www</pre>
+
+<p>If you encounter any errors, trying checking the following</p>
+<pre>
+    sudo less /var/log/nginx/error.log: checks the Nginx error logs.
+    sudo less /var/log/nginx/access.log: checks the Nginx access logs.
+    sudo journalctl -u nginx: checks the Nginx process logs.
+    sudo journalctl -u myproject: checks your Flask app’s Gunicorn logs.
+</pre>
 in process...
 
 

@@ -126,7 +126,7 @@ sudo ufw delete allow 5001
 sudo ufw allow 'Nginx Full'</pre>
 
 <p>Note: You will receive an HTTP 502 gateway error if Nginx cannot access gunicorn’s socket file. Usually this is because the user’s home directory does not allow other users to access files inside it.</p>
-
+<pre>sudo chmod 755 /var/www</pre>
 in process...
 
 

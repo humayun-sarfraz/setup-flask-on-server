@@ -78,3 +78,4 @@ Set Environment Variables: Set FLASK_ENV and FLASK_DEBUG to enable development m
 Update and Reload Systemd Service: Ensure the service file includes these environment variables, reload systemd, and restart the services.
 By following these steps, Flask will not cache templates, and any changes to your HTML files should be reflected immediately.
 
+<hr />

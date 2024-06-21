@@ -135,7 +135,7 @@ sudo ufw allow 'Nginx Full'</pre>
     sudo journalctl -u nginx: checks the Nginx process logs.
     sudo journalctl -u myproject: checks your Flask app’s Gunicorn logs.
 </pre>
-in process.....
+in process......
 
 
 
